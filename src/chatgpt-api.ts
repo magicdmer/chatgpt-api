@@ -149,6 +149,7 @@ export class ChatGPTAPI {
     } = opts
 
     let { abortSignal } = opts
+    let { gizmo_id } = opts
 
     let abortController: AbortController = null
     if (timeoutMs && !abortSignal) {
@@ -186,12 +187,29 @@ export class ChatGPTAPI {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this._apiKey}`
         }
-        const body = {
-          max_tokens: maxTokens,
-          ...this._completionParams,
-          ...completionParams,
-          messages,
-          stream
+
+        let body: any
+        if (gizmo_id !== undefined) {
+          const conversation_mode = {
+            kind: 'gizmo_interaction',
+            gizmo_id: gizmo_id // 从opts中获取
+          }
+          body = {
+            max_tokens: maxTokens,
+            ...this._completionParams,
+            ...completionParams,
+            messages,
+            stream,
+            conversation_mode
+          }
+        } else {
+          body = {
+            max_tokens: maxTokens,
+            ...this._completionParams,
+            ...completionParams,
+            messages,
+            stream
+          }
         }
 
         // Support multiple organizations
@@ -361,6 +379,7 @@ export class ChatGPTAPI {
   protected async _buildMessages(text: string, opts: types.SendMessageOptions) {
     const { systemMessage = this._systemMessage } = opts
     let { parentMessageId } = opts
+    let { gizmo_id } = opts
 
     const userLabel = USER_LABEL_DEFAULT
     const assistantLabel = ASSISTANT_LABEL_DEFAULT
@@ -368,7 +387,7 @@ export class ChatGPTAPI {
     const maxNumTokens = this._maxModelTokens - this._maxResponseTokens
     let messages: types.openai.ChatCompletionRequestMessage[] = []
 
-    if (systemMessage) {
+    if (systemMessage && gizmo_id === undefined) {
       messages.push({
         role: 'system',
         content: systemMessage

@@ -45,6 +45,7 @@ export type SendMessageOptions = {
   timeoutMs?: number
   onProgress?: (partialResponse: ChatMessage) => void
   abortSignal?: AbortSignal
+  gizmo_id?: string
   completionParams?: Partial<
     Omit<openai.CreateChatCompletionRequest, 'messages' | 'n' | 'stream'>
   >
