@@ -82,7 +82,7 @@ export class ChatGPTAPI {
 
     if (this._systemMessage === undefined) {
       const currentDate = new Date().toISOString().split('T')[0]
-      this._systemMessage = `You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.\nKnowledge cutoff: 2021-09-01\nCurrent date: ${currentDate}`
+      this._systemMessage = ''
     }
 
     this._maxModelTokens = maxModelTokens
@@ -387,7 +387,7 @@ export class ChatGPTAPI {
     const maxNumTokens = this._maxModelTokens - this._maxResponseTokens
     let messages: types.openai.ChatCompletionRequestMessage[] = []
 
-    if (systemMessage && gizmo_id === undefined) {
+    if (systemMessage.length > 0 && gizmo_id === undefined) {
       messages.push({
         role: 'system',
         content: systemMessage
